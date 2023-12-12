@@ -1,23 +1,29 @@
-import logo from './logo.svg';
 import './App.css';
+import CellTowerComponent from './components/CellTowerComponent/index';
+import CellGlobe from './components/CellGlobe';
+
 
 function App() {
+  const height = window.innerHeight
+  const width = window.innerWidth
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <div className="section globe-section">
+        <CellGlobe width={width/2} height = {height} />
+      </div>
+      <div className="section other-section">
+        <CellTowerComponent width={width / 2} height={height} />
+        {/* <div className='vertical-container'>
+          <div className='top-section'>
+            
+          </div>
+          <div className='top-section'>
+            sdadass
+          </div>
+        </div> */}
+      </div>
     </div>
   );
 }

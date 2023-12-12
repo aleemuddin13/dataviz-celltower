@@ -1,13 +1,62 @@
-body {
+/* Global Styles */
+body,
+html {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  height: 100%;
+  background-color: black;
+  color: white;
+  /* Assuming you want light text on a dark background */
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Container for the two sections */
+.container {
+  display: flex;
+  height: 100vh;
+  /* Full viewport height */
+}
+
+.vertical-container {
+  display: flex;
+  flex-direction: column;
+  /* Display children in a column (vertical) */
+  height: 100vh;
+}
+
+.top-section {
+  flex: 1;
+  /* Take up 50% of the available height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Just for visualization */
+}
+
+.bottom-section {
+  flex: 1;
+  /* Take up 50% of the available height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Just for visualization */
+}
+
+/* Left and Right Sections */
+.section {
+  flex: 1;
+  /* Each section takes up half of the container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Additional styling for the globe component */
+.globe-section {
+  /* You can add specific styles for the globe section here, if needed */
+}
+
+/* Additional styling for the other component */
+.other-section {
+  /* Specific styles for the other section */
 }
