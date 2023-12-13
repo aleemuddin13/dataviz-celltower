@@ -18,38 +18,7 @@ const CellTowerComponent = ({ width, height }) => {
     const selectedFloor = main.filter.year
     const filterRadio  = main.filter.radio
 
-
-    const radioPer = {
-        GSM: 0, CDMA: 0, UMTS: 0, LTE: 0
-    }
-
-    let totalCells = 0
-
-    if(filterRadio.GSM){
-        totalCells += main.stats.radio.GSM
-    }
-    if (filterRadio.CDMA) {
-        totalCells += main.stats.radio.CDMA
-    }
-    if (filterRadio.UMTS) {
-        totalCells += main.stats.radio.UMTS
-    }
-    if (filterRadio.LTE) {
-        totalCells += main.stats.radio.LTE
-    }
-
-    if (filterRadio.GSM) {
-        radioPer.GSM = main.stats.radio.GSM / totalCells
-    }
-    if (filterRadio.CDMA) {
-        radioPer.CDMA = main.stats.radio.CDMA / totalCells
-    }
-    if (filterRadio.UMTS) {
-        radioPer.UMTS = main.stats.radio.UMTS / totalCells
-    }
-    if (filterRadio.LTE) {
-        radioPer.LTE = main.stats.radio.LTE / totalCells
-    }
+    const radioPer = main.stats.radioPer
 
 
     const [initialized, setInitialized] = useState(false); 

@@ -17,7 +17,7 @@ import { useSpring, animated } from "@react-spring/web";
 // };
 
 export const BarItem = (props) => {
-    const { name, value, barHeight, barWidth, x, y } = props;
+    const { name, value, barHeight, barWidth, x, y, fill } = props;
 
     const springProps = useSpring({
         // the 'from' properties will be used only to animate the initialization of the component
@@ -39,38 +39,17 @@ export const BarItem = (props) => {
     });
 
     return (
-        <g>
             <animated.rect
                 x={x}
                 y={springProps.y}
                 width={springProps.barWidth}
                 height={barHeight}
-                opacity={0.7}
-                stroke="#9d174d"
-                fill="#9d174d"
-                fillOpacity={0.3}
+                opacity={springProps.valueOpacity}
+                fill={fill}
+                // fillOpacity={0.3}
                 strokeWidth={1}
                 rx={1}
             />
-            <animated.text
-                x={springProps.barWidth?.to((width) => width - 7)}
-                y={springProps.y?.to((y) => y + barHeight / 2)}
-                textAnchor="end"
-                alignmentBaseline="central"
-                fontSize={12}
-                opacity={springProps.valueOpacity}
-            >
-                {springProps.value?.to((value) => value.toFixed(0))}
-            </animated.text>
-            <animated.text
-                x={x + 7}
-                y={springProps.y?.to((y) => y + barHeight / 2)}
-                textAnchor="start"
-                alignmentBaseline="central"
-                fontSize={12}
-            >
-                {name}
-            </animated.text>
-        </g>
+           
     );
 };

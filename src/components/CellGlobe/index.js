@@ -3,9 +3,12 @@ import Globe from 'react-globe.gl';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCountries, fetchPoints, setAltitude, setTransitionDuration } from '../../store/reducers/CellGlobeReducer';
 import statsJSON from '../../datasets/stats.json'
+import helper from '../../lib/helper'
 
 import { scaleSequential } from 'd3-scale';
 import { interpolateGreys, interpolateOranges, interpolateCividis } from 'd3-scale-chromatic';
+
+const formatLargeNumber = helper.formatLargeNumber
 
 function randomIntFromInterval(min, max) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min)
@@ -159,28 +162,24 @@ const CellGlobe = ({ width, height }) => {
         polygonCapColor={(d) => colorScale(randomIntFromInterval(1,10)/10)}
         polygonSideColor={() => '#36454F'}
         polygonLabel={({ properties: d }) =>{ 
-            
-            const st = statsJSON[d.ADMIN]
-            if(!st){
-                return `<b>${d.ADMIN} (${d.ISO_A2})</b> <br /> Data Not Available.`
-            }
             let total = 0
-            const gsm = mapPercentageToRange(yearPer, 0, st.GSM, customScaleFactors1)
-            const CDMA = mapPercentageToRange(yearPer, 0, st.CDMA, customScaleFactors2)
-            const UMTS = mapPercentageToRange(yearPer, 0, st.UMTS, customScaleFactors3)
-            const LTE = mapPercentageToRange(yearPer, 0, st.LTE, customScaleFactors4)
+            const cData = main.data[main.filter.year][main.filter.range].cMap[d.ISO_A2]
+            const gsm = formatLargeNumber(cData.GSM)
+            const CDMA = formatLargeNumber(cData.CDMA)
+            const UMTS = formatLargeNumber(cData.UMTS)
+            const LTE = formatLargeNumber(cData.LTE)
 
-            total = gsm + CDMA + UMTS + LTE
+            total = formatLargeNumber(cData.GSM + cData.CDMA + cData.UMTS + cData.LTE)
 
-            return `
-      <b>${d.ADMIN} (${d.ISO_A2})</b> <br />
-      Cell Towers: <i>${Math.round(total/1000)}K</i> <br/>
-      GSM(2G): <i>${Math.round(gsm/1000)}K</i> <br/>
-      CDMA(2G): <i>${Math.round(CDMA /1000)}K</i> <br/>
-      UMTS(3G): <i>${Math.round(UMTS /1000)}K</i> <br/>
-      LTE(4G/5G): <i>${Math.round(LTE/1000)}K</i> <br/>
-
-    `}}
+            return `<div style="color: #FFA500;">
+                    <b>${d.ADMIN} (${d.ISO_A2})</b> <br />
+                    Cell Towers: <i>${total}</i> <br/>
+                    GSM(2G): <i>${gsm}</i> <br/>
+                    CDMA(2G): <i>${CDMA}</i> <br/>
+                    UMTS(3G): <i>${UMTS}</i> <br/>
+                    LTE(4G/5G): <i>${LTE}</i> <br/>
+                    </div>
+             `}}
 
         // htmlElementsData={newGData}
         // htmlElement={d => {

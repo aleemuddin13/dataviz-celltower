@@ -1,116 +1,108 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useState } from "react";
 import * as d3 from "d3";
-import styles from "./donut-chart.module.css";
+import { animated, SpringValue, useSpring } from "react-spring";
+import Tooltip from "./Tooltip";
 
 // type DataItem = {
 //     name: string;
-//     value: number;
+//     value?: number;
 // };
+
 // type DonutChartProps = {
 //     width: number;
 //     height: number;
 //     data: DataItem[];
 // };
 
-const MARGIN_X = 150;
-const MARGIN_Y = 50;
-const INFLEXION_PADDING = 20; // space between donut and label inflexion point
+const MARGIN = 30;
 
+// const colors = [
+//     "#e0ac2b",
+//     "#e85252",
+//     "#6689c6",
+//     "#9a6fb0",
+//     "#a53253",
+//     "#69b3a2",
+// ];
 
-export const DonutChart = ({ width, height, data, colors}) => {
-    const ref = useRef(null);
+export const DonutChart = ({ width, height, data, colors, centerText, centerTextColor }) => {
 
-    const radius = Math.min(width - 2 * MARGIN_X, height - 2 * MARGIN_Y) / 2;
-    const innerRadius = radius / 2;
+    const [interactionData, setInteractionData] = useState();
+
+    // Sort by alphabetical to maximise consistency between dataset
+    const sortedData = data.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+
+    const radius = Math.min(width, height) / 2 - MARGIN;
 
     const pie = useMemo(() => {
-        const pieGenerator = d3.pie().value((d) => d.value);
-        return pieGenerator(data);
+        const pieGenerator = d3
+            .pie()
+                .value((d) => d.value || 0)
+                .sort(null); // Do not apply any sorting, respect the order of the provided dataset
+        return pieGenerator(sortedData);
     }, [data]);
 
-    const arcGenerator = d3.arc();
-
-    const shapes = pie.map((grp, i) => {
-        // First arc is for the donut
-        const sliceInfo = {
-            innerRadius,
-            outerRadius: radius,
-            startAngle: grp.startAngle,
-            endAngle: grp.endAngle,
-        };
-        const centroid = arcGenerator.centroid(sliceInfo);
-        const slicePath = arcGenerator(sliceInfo);
-
-        // Second arc is for the legend inflexion point
-        const inflexionInfo = {
-            innerRadius: radius + INFLEXION_PADDING,
-            outerRadius: radius + INFLEXION_PADDING,
-            startAngle: grp.startAngle,
-            endAngle: grp.endAngle,
-        };
-        const inflexionPoint = arcGenerator.centroid(inflexionInfo);
-
-        const isRightLabel = inflexionPoint[0] > 0;
-        const labelPosX = inflexionPoint[0] + 50 * (isRightLabel ? 1 : -1);
-        const textAnchor = isRightLabel ? "start" : "end";
-        const label = grp.data.name + " (" + grp.value + ")";
-
+    const allPaths = pie.map((slice, i) => {
         return (
-            <g
-                key={i}
-                className={styles.slice}
-                onMouseEnter={() => {
-                    if (ref.current) {
-                        ref.current.classList.add(styles.hasHighlight);
-                    }
+            <g key={slice.data.name} onMouseEnter={(e) => {
+                setInteractionData({
+                    x: e.pageX,
+                    y: e.pageY,
+                    text: slice.data.text
+                })
                 }}
+
                 onMouseLeave={() => {
-                    if (ref.current) {
-                        ref.current.classList.remove(styles.hasHighlight);
-                    }
+                    setInteractionData(false)
                 }}
             >
-                <path d={slicePath} fill={colors[i]} />
-                <circle cx={centroid[0]} cy={centroid[1]} r={2} />
-                <line
-                    x1={centroid[0]}
-                    y1={centroid[1]}
-                    x2={inflexionPoint[0]}
-                    y2={inflexionPoint[1]}
-                    stroke={"white"}
-                    fill={"white"}
-                />
-                <line
-                    x1={inflexionPoint[0]}
-                    y1={inflexionPoint[1]}
-                    x2={labelPosX}
-                    y2={inflexionPoint[1]}
-                    stroke={"white"}
-                    fill={"white"}
-                />
-                <text
-                    x={labelPosX + (isRightLabel ? 2 : -2)}
-                    y={inflexionPoint[1]}
-                    textAnchor={textAnchor}
-                    dominantBaseline="middle"
-                    fontSize={14}
-                    fill="white"
-                >
-                    {label}
-                </text>
+            <Slice
+                key={slice.data.name}
+                radius={radius}
+                slice={slice}
+                color={colors[i]}
+                
+            />
             </g>
         );
     });
 
     return (
+        <div>
         <svg width={width} height={height} style={{ display: "inline-block" }}>
-            <g
-                transform={`translate(${width / 2}, ${height / 2})`}
-                className={styles.container}
-                ref={ref}
-            >
-                {shapes}
-            </g>
+            <g transform={`translate(${width / 2}, ${height / 2})`}>{allPaths}</g>
+                <text x={width/2} y={height/2} fill="white" text-anchor="middle" color={centerTextColor}>{centerText}</text>
         </svg>
+        <Tooltip interactionData={interactionData}/>
+        </div>
+    );
+};
+
+// type SliceProps = {
+//     color: string;
+//     radius: number;
+//     slice: d3.PieArcDatum<DataItem>;
+// };
+const Slice = ({ slice, radius, color }) => {
+    const arcPathGenerator = d3.arc();
+
+    const springProps = useSpring({
+        to: {
+            pos: [slice.startAngle, slice.endAngle],
+        },
+    });
+
+    return (
+        <animated.path
+            d={springProps.pos.to((start, end) => {
+                return arcPathGenerator({
+                    innerRadius: 40,
+                    outerRadius: radius,
+                    startAngle: start,
+                    endAngle: end,
+                });
+            })}
+            fill={color}
+        />
     );
 };

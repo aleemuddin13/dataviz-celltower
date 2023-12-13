@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import data from '../datasets/main.json'
+import data from '../datasets/main3.json'
 
 const ccList = Object.keys(data[2010][1].cMap)
 
@@ -47,6 +47,42 @@ const updateCurrentStats = (state) => {
         stats.radio.LTE += obj.LTE
         countryDataList.push({...obj, cc: country})
     }
+
+    const radioPer = {
+        GSM: 0, CDMA: 0, UMTS: 0, LTE: 0
+    }
+
+    let totalCells = 0
+    const filterRadio = state.filter.radio
+
+    if (filterRadio.GSM) {
+        totalCells += stats.radio.GSM
+    }
+    if (filterRadio.CDMA) {
+        totalCells += stats.radio.CDMA
+    }
+    if (filterRadio.UMTS) {
+        totalCells += stats.radio.UMTS
+    }
+    if (filterRadio.LTE) {
+        totalCells += stats.radio.LTE
+    }
+
+    if (filterRadio.GSM) {
+        radioPer.GSM = stats.radio.GSM / totalCells
+    }
+    if (filterRadio.CDMA) {
+        radioPer.CDMA = stats.radio.CDMA / totalCells
+    }
+    if (filterRadio.UMTS) {
+        radioPer.UMTS = stats.radio.UMTS / totalCells
+    }
+    if (filterRadio.LTE) {
+        radioPer.LTE = stats.radio.LTE / totalCells
+    }
+
+    stats.totalCells = totalCells
+    stats.radioPer = radioPer
 
     stats.countryDataList = countryDataList
     state.stats = stats
