@@ -14,7 +14,7 @@ function randomIntFromInterval(min, max) { // min and max included
 }
 
 // Define the sequential color scale
-const colorScale = scaleSequential(interpolateGreys).domain([1,0]);
+const colorScale = scaleSequential(interpolateCividis).domain([0,1]);
 
 
 function getRandomElementsFromArray(array, n) {
@@ -107,12 +107,29 @@ const CellGlobe = ({ width, height }) => {
     <circle cx="0.5" cy="0.5" r="0.4" fill="red"></circle>
 </svg>`
 
-    const gData = xp.map((x) => ({
-        lat: x.lat,
-        lng: x.lon,
-        size: 0.000001,
-        color: [main.color.GSM, main.color.CDMA, main.color.UMTS, main.color.LTE][Math.round(Math.random() * 3)]
-    }));
+    const gData = []
+    const colors = []
+    if (main.filter.radio.GSM) {
+        colors.push(main.color.GSM)
+    }
+    if (main.filter.radio.CDMA) {
+        colors.push(main.color.CDMA)
+    }
+    if (main.filter.radio.UMTS) {
+        colors.push(main.color.UMTS)
+    }
+    if (main.filter.radio.LTE) {
+        colors.push(main.color.LTE)
+    }
+
+    for (const x of xp) {
+        gData.push({
+            lat: x.lat,
+            lng: x.lon,
+            size: 0.000001,
+            color: colors[Math.round(Math.random() * colors.length)]
+        })
+    }
 
     let newGData = []
     const iLat = 39.0
@@ -192,12 +209,12 @@ const CellGlobe = ({ width, height }) => {
         //     return el;
         // }}
 
-        pointsData={newGData}
+        pointsData={gData}
         pointColor="color"
         pointsMerge={false}
-        pointRadius={0.01}
-        pointResolution={5}
-        pointAltitude={0.01}
+        pointRadius={0.05}
+        pointResolution={3}
+        pointAltitude={0.03}
 
         // pointAltitude="size"
         // polygonsTransitionDuration={transitionDuration}
