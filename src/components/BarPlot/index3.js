@@ -69,7 +69,7 @@ export const Barplot = ({ width, height, data, subGroups, groups, COLORS }) => {
         return (
             <g key={i}>
                 {subgroup.map((group, j) => {
-                    console.log(group, "a2", xScale(group[0]), xScale(group[1]) - xScale(group[0]), subgroup.key)
+                    // console.log(group, "a2", xScale(group[0]), xScale(group[1]) - xScale(group[0]), subgroup.key)
                     return (
                         <rect
                             key={j}

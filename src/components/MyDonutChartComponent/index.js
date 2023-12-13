@@ -14,6 +14,8 @@ const MyDonutChartComponent = ({ width, height }) => {
     const data = []
     const COLORS = []
 
+    let str = ''
+
     if (filter.radio.GSM) {
         data.push({ 
             name: "GSM",
@@ -21,6 +23,7 @@ const MyDonutChartComponent = ({ width, height }) => {
             text: 'GSM('+(radioPer.GSM*100).toFixed(0)+'%) - '+formatLargeNumber(stats.radio.GSM)
         })
         COLORS.push(main.color.GSM)
+        
     }
 
     if (filter.radio.CDMA) {
@@ -50,7 +53,10 @@ const MyDonutChartComponent = ({ width, height }) => {
         COLORS.push(main.color.LTE)
     }
 
-    return <DonutChart width={width} height={height} data={data} colors={COLORS} centerText={formatLargeNumber(main.stats.totalCells)} centerTextColor={main.color.PRIMARY} />
+    return <div>
+        <h6 style={{ padding: 10, margin: 0, marginLeft: 30, height: 10 }}>Radio percentages:</h6>
+        <DonutChart width={width} height={height-20} data={data} colors={COLORS} centerText={formatLargeNumber(main.stats.totalCells)} centerTextColor={main.color.PRIMARY} />
+    </div>
 }
 
 export default MyDonutChartComponent

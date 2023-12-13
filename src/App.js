@@ -29,12 +29,13 @@ function App() {
             </div>
           </div>
           <div className="top-section">
-            <MyBarPlotComponent width={width / 2} height={height / 2} />
+            <div>
+              <h6 style={{padding: 0, margin: 0, marginLeft: 30}}>Top countries with most number of cell towers</h6>
+              <MyBarPlotComponent width={width / 2} height={(height / 2)-20} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div className='color-scale'>
     </div>
     </div>
   );

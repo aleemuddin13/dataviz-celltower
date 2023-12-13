@@ -34,10 +34,13 @@ const updateCurrentStats = (state) => {
             CDMA: 0,
             UMTS: 0,
             LTE: 0
-        }
+        },
+        maxCount: 1,
+        minCount: 99999999
     }
     const mainData = state.data[state.filter.year][state.filter.range]
     const countryDataList = []
+    const filterRadio = state.filter.radio
 
     for (const country of ccList) {
         const obj = mainData.cMap[country]
@@ -46,6 +49,21 @@ const updateCurrentStats = (state) => {
         stats.radio.UMTS += obj.UMTS
         stats.radio.LTE += obj.LTE
         countryDataList.push({...obj, cc: country})
+        let total = 0
+        if(filterRadio.GSM){
+            total += obj.GSM
+        }
+        if (filterRadio.CDMA) {
+            total += obj.CDMA
+        }
+        if (filterRadio.UMTS) {
+            total += obj.UMTS
+        }
+        if (filterRadio.LTE) {
+            total += obj.LTE
+        }
+        stats.minCount = Math.min(stats.minCount, total)
+        stats.maxCount = Math.max(stats.maxCount, total)
     }
 
     const radioPer = {
@@ -53,7 +71,7 @@ const updateCurrentStats = (state) => {
     }
 
     let totalCells = 0
-    const filterRadio = state.filter.radio
+    
 
     if (filterRadio.GSM) {
         totalCells += stats.radio.GSM
@@ -80,7 +98,7 @@ const updateCurrentStats = (state) => {
     if (filterRadio.LTE) {
         radioPer.LTE = stats.radio.LTE / totalCells
     }
-
+    
     stats.totalCells = totalCells
     stats.radioPer = radioPer
 

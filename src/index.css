@@ -71,11 +71,11 @@ html {
   /* Adjust the top position as needed */
   left: 20px;
   /* Adjust the left position as needed */
-  width: 600px;
+  /* width: 600px; */
   /* Adjust the width of the color scale */
   height: 30px;
   /* background-color: white */
   /* Adjust the height of the color scale */
-  background: linear-gradient(to right, #000, #333, #666, #999, #ccc, #eee);
+  /* background: linear-gradient(to right, #000, #333, #666, #999, #ccc, #eee); */
   /* Greyscale colors */
 }

@@ -1,8 +1,7 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
+import * as d3 from "d3";
 import Globe from 'react-globe.gl';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchCountries, fetchPoints, setAltitude, setTransitionDuration } from '../../store/reducers/CellGlobeReducer';
-import statsJSON from '../../datasets/stats.json'
 import helper from '../../lib/helper'
 
 import { scaleSequential } from 'd3-scale';
@@ -15,7 +14,7 @@ function randomIntFromInterval(min, max) { // min and max included
 }
 
 // Define the sequential color scale
-const colorScale = scaleSequential(interpolateGreys);
+const colorScale = scaleSequential(interpolateGreys).domain([1,0]);
 
 
 function getRandomElementsFromArray(array, n) {
@@ -39,54 +38,6 @@ function getRandomElementsFromArray(array, n) {
     return shuffledArray.slice(0, n);
 }
 
-function mapPercentageToRange(percentage, min, max, customScaleFactors) {
-    // Ensure the input percentage is within the valid range (0-100)
-    percentage = Math.min(100, Math.max(0, percentage));
-
-    // Initialize a default scaling factor
-    let scaleFactor = 1;
-
-    // Find the appropriate custom scaling factor for the given percentage range
-    for (const [rangeStart, rangeEnd, customFactor] of customScaleFactors) {
-        if (percentage >= rangeStart && percentage <= rangeEnd) {
-            scaleFactor = customFactor;
-            break;
-        }
-    }
-
-    // Calculate the mapped value using the selected scaling factor
-    const mappedValue = min + (max - min) * Math.pow(percentage / 100, scaleFactor);
-
-    return mappedValue;
-}
-
-const customScaleFactors1 = [
-    [0, 25, 1],   // 0-25% range with scaleFactor 2
-    [25, 50, 3],  // 25-50% range with scaleFactor 3
-    [50, 75, 4],  // 50-75% range with scaleFactor 4
-    [75, 100, 5], // 75-100% range with scaleFactor 5
-];
-
-const customScaleFactors2 = [
-    [0, 25, 1],   // 0-25% range with scaleFactor 2
-    [25, 50, 3],  // 25-50% range with scaleFactor 3
-    [50, 75, 4],  // 50-75% range with scaleFactor 4
-    [75, 100, 5], // 75-100% range with scaleFactor 5
-];
-
-const customScaleFactors3 = [
-    [0, 25, 4],   // 0-25% range with scaleFactor 2
-    [25, 50, 3],  // 25-50% range with scaleFactor 3
-    [50, 75, 2],  // 50-75% range with scaleFactor 4
-    [75, 100, 1], // 75-100% range with scaleFactor 5
-];
-const customScaleFactors4 = [
-    [0, 50, 6],   // 0-25% range with scaleFactor 2
-    // [25, 50, 6],  // 25-50% range with scaleFactor 3
-    [50, 75, 2],  // 50-75% range with scaleFactor 4
-    [75, 100, 1], // 75-100% range with scaleFactor 5
-];
-
 
 const CellGlobe = ({ width, height }) => {
     const globeEl = useRef();
@@ -96,6 +47,37 @@ const CellGlobe = ({ width, height }) => {
     const yearPer = useSelector((state) => state.towerReducer.yearPer)
 
     const main = useSelector((state) => state.mainReducer)
+
+    const xScale = useMemo(() => {
+        return d3.scaleLinear().domain([0, main.stats.maxCount]).range([0, width]);
+    }, [main.stats, width]);
+
+    const grid = xScale
+        .ticks(5)
+        .slice(1)
+        .map((value, i) => (
+            <g key={i}>
+                <line
+                    x1={xScale(value)}
+                    x2={xScale(value)}
+                    y1={0}
+                    y2={50}
+                    stroke="white"
+                    opacity={0.4}
+                />
+                <text
+                    x={xScale(value)}
+                    y={50 + 10}
+                    textAnchor="middle"
+                    alignmentBaseline="central"
+                    fontSize={9}
+                    opacity={0.8}
+                    fill={"white"}
+                >
+                    {formatLargeNumber(value)}
+                </text>
+            </g>
+        ));
 
     // useEffect(() => {
     //     // dispatch(fetchCountries());
@@ -145,7 +127,7 @@ const CellGlobe = ({ width, height }) => {
         }
     }
 
-    return <Globe
+    return <div><Globe
         ref={globeEl}
         width={width}
         backgroundColor={"black"}
@@ -159,7 +141,23 @@ const CellGlobe = ({ width, height }) => {
         // polygonCapColor={() => 'rgba(0, 0, 0, 0)'} rgba(200, 0, 0, 0.6)
         // polygonSideColor={() => 'rgba(0, 0, 0, 0)'} rgba(0, 100, 0, 0.15)
         // polygonAltitude={0.1}
-        polygonCapColor={(d) => colorScale(randomIntFromInterval(1,10)/10)}
+        polygonCapColor={({ properties: d}) => {
+            const cData = main.data[main.filter.year][main.filter.range].cMap[d.ISO_A2]
+            let total = 0
+            if(main.filter.radio.GSM){
+                total += cData.GSM
+            }
+            if (main.filter.radio.CDMA) {
+                total += cData.CDMA
+            }
+            if (main.filter.radio.UMTS) {
+                total += cData.UMTS
+            }
+            if (main.filter.radio.LTE) {
+                total += cData.LTE
+            }
+            return colorScale(total/main.stats.maxCount)
+        }}
         polygonSideColor={() => '#36454F'}
         polygonLabel={({ properties: d }) =>{ 
             let total = 0
@@ -174,10 +172,10 @@ const CellGlobe = ({ width, height }) => {
             return `<div style="color: #FFA500;">
                     <b>${d.ADMIN} (${d.ISO_A2})</b> <br />
                     Cell Towers: <i>${total}</i> <br/>
-                    GSM(2G): <i>${gsm}</i> <br/>
-                    CDMA(2G): <i>${CDMA}</i> <br/>
-                    UMTS(3G): <i>${UMTS}</i> <br/>
-                    LTE(4G/5G): <i>${LTE}</i> <br/>
+                    <d style="color: #FF5733;">GSM(2G): <i>${gsm}</i></d> <br/>
+                    <d style="color: #33FF57;">CDMA(2G): <i>${CDMA}</i></d> <br/>
+                    <d style="color: #3377FF;">UMTS(3G): <i>${UMTS}</i></d> <br/>
+                    <d style="color: #FF33DD;">LTE(4G/5G): <i>${LTE}</i></d> <br/>
                     </div>
              `}}
 
@@ -203,7 +201,13 @@ const CellGlobe = ({ width, height }) => {
 
         // pointAltitude="size"
         // polygonsTransitionDuration={transitionDuration}
-    />;
+    />
+        <div className='color-scale' style={{ width: width - 40, background: `linear-gradient(to right, ${colorScale(0)}, ${colorScale(0.5)}, ${colorScale(1)})`}}>
+            <svg width={width-40} height={90}>
+                <g>{grid}</g>
+            </svg>
+        </div>
+    </div>;
 };
 
 export default CellGlobe;

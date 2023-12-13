@@ -132,7 +132,7 @@ const MyBarPlotComponent = ({width, height}) => {
         COLORS.push(main.color.LTE)
     }
 
-    console.log(groups, subGroups, data)
+    // console.log(groups, subGroups, data)
 
     // data = [
     //     { group: "Mark", subgroup: "travel", value: 90 },
