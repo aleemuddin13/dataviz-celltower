@@ -58,5 +58,24 @@ html {
 
 /* Additional styling for the other component */
 .other-section {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   /* Specific styles for the other section */
+}
+
+.color-scale {
+  position: absolute;
+  top: 20px;
+  /* Adjust the top position as needed */
+  left: 20px;
+  /* Adjust the left position as needed */
+  width: 600px;
+  /* Adjust the width of the color scale */
+  height: 30px;
+  /* background-color: white */
+  /* Adjust the height of the color scale */
+  background: linear-gradient(to right, #000, #333, #666, #999, #ccc, #eee);
+  /* Greyscale colors */
 }

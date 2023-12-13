@@ -4,7 +4,7 @@ import { sliderVertical } from 'd3-simple-slider';
 import { useSelector, useDispatch } from 'react-redux';
 import helper from '../../lib/helper';
 
-import { setFloor, updateRadio, updateTowerRange } from '../../store/reducers/TowerReducer';
+import {updateFilterRadio, updateFilterRange, updateFilterYear} from '../../store/MainReducer'
 
 
 let sliderDone = false
@@ -13,20 +13,61 @@ let sliderDone = false
 const CellTowerComponent = ({ width, height }) => {
     const svgRef = useRef();
     const dispatch = useDispatch();
-    const selectedFloor  = useSelector((state) => state.towerReducer.selectedFloor)
-    const enableRadio = useSelector((state) => state.towerReducer.enableRadio)
-    const towerRange = useSelector((state) => state.towerReducer.towerRange)
-    const radioPer = useSelector((state) => state.towerReducer.radioPer)
+
+    const main = useSelector((state) => state.mainReducer)
+    const selectedFloor = main.filter.year
+    const filterRadio  = main.filter.radio
+
+
+    const radioPer = {
+        GSM: 0, CDMA: 0, UMTS: 0, LTE: 0
+    }
+
+    let totalCells = 0
+
+    if(filterRadio.GSM){
+        totalCells += main.stats.radio.GSM
+    }
+    if (filterRadio.CDMA) {
+        totalCells += main.stats.radio.CDMA
+    }
+    if (filterRadio.UMTS) {
+        totalCells += main.stats.radio.UMTS
+    }
+    if (filterRadio.LTE) {
+        totalCells += main.stats.radio.LTE
+    }
+
+    if (filterRadio.GSM) {
+        radioPer.GSM = main.stats.radio.GSM / totalCells
+    }
+    if (filterRadio.CDMA) {
+        radioPer.CDMA = main.stats.radio.CDMA / totalCells
+    }
+    if (filterRadio.UMTS) {
+        radioPer.UMTS = main.stats.radio.UMTS / totalCells
+    }
+    if (filterRadio.LTE) {
+        radioPer.LTE = main.stats.radio.LTE / totalCells
+    }
 
 
     const [initialized, setInitialized] = useState(false); 
 
-    const { height: towerHeight, width: towerWidth } = helper.resizeWithAspectRatio(false, height * 0.9 - 30, 1 / 5)
+    const { height: towerHeight, width: towerWidth } = helper.resizeWithAspectRatio(false, height * 0.9 - 30, 1 / 3)
     const towerGemetryData = helper.getSutroTowerData(towerWidth, towerHeight, 13) 
 
     const createFloors = (svg, data) => {
         svg.selectAll('.trapezoid').remove();
         svg.selectAll('.trapezoid-text').remove();
+
+        const onFloorClick = (event, d) => {
+            if (d.text !== selectedFloor) {
+                dispatch(updateFilterYear(d.text))
+            } else {
+                dispatch(updateFilterYear(2023))
+            }
+        }
 
         
         svg.selectAll('.trapezoid')
@@ -41,20 +82,12 @@ const CellTowerComponent = ({ width, height }) => {
             })
             .attr("stroke", "grey")
             .attr('fill', (d) => {
-                if(!selectedFloor || selectedFloor < d.text){
+                if(selectedFloor === 2023 || selectedFloor < d.text){
                     return false
                 }
-                return 'blue'
+                return main.color.PRIMARY
             }) // Change fill color as needed
-            .on('click', (event, d) => {
-                // Handle click event for each trapezoid here
-                if(d.text !== selectedFloor){
-                    dispatch(setFloor(d.text))
-                }else{
-                    dispatch(setFloor(false))
-                }
-
-            });
+            .on('click', onFloorClick);
 
         svg.selectAll('.trapezoid-text')
             .data(data)
@@ -66,7 +99,9 @@ const CellTowerComponent = ({ width, height }) => {
             .attr('dy', '1em') // Adjust vertical alignment
             .attr('fill', 'white')
             .attr('text-anchor', 'middle') // Center the text horizontally
-            .text((d) => d.text);
+            .text((d) => d.text)
+            .on('click', onFloorClick);
+
     }
 
     const createAntenna = (svg, data) => {
@@ -77,8 +112,8 @@ const CellTowerComponent = ({ width, height }) => {
         const antennaToggle = (event, d) => {
             const updateObj = {}
             const key = d.radio
-            updateObj[key] = !enableRadio[d.radio]
-            dispatch(updateRadio(updateObj))
+            updateObj[key] = !filterRadio[d.radio]
+            dispatch(updateFilterRadio(updateObj))
         }
 
 
@@ -92,8 +127,8 @@ const CellTowerComponent = ({ width, height }) => {
             .attr('width', d => d.width) // Adjust to fill half
             .attr('height', d => d.height)
             .attr("stroke", (d) => {
-                if(enableRadio[d.radio]){
-                    return "yellow"
+                if(filterRadio[d.radio]){
+                    return main.color[d.radio]
                 }
                 return "grey"
             })
@@ -120,14 +155,14 @@ const CellTowerComponent = ({ width, height }) => {
                 return d.height * per
             })
             .attr("stroke", (d) => {
-                if (enableRadio[d.radio]) {
-                    return "yellow"
+                if (filterRadio[d.radio]) {
+                    return main.color[d.radio]
                 }
                 return "grey"
             })
             // .attr("stroke", "grey")
             .attr('fill', (d) => {
-                return 'blue'
+                return main.color[d.radio]
             })
             .on('click', antennaToggle);
 
@@ -184,7 +219,7 @@ const CellTowerComponent = ({ width, height }) => {
                 .height(towerGemetryData.centerVertical.y2 - towerGemetryData.centerVertical.y1 - 10)
                 .on('onchange', (value) => {
                     console.log(value)
-                    dispatch(updateTowerRange(value))
+                    dispatch(updateFilterRange(value))
                 });
             const sliderGeom = g.append('g').attr('class', 'tower-slider').attr('transform',
                 `translate(${towerGemetryData.centerVertical.x1+10}, ${towerGemetryData.centerVertical.y1})`);

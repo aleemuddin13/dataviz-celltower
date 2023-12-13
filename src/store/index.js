@@ -85,13 +85,15 @@ import { configureStore } from '@reduxjs/toolkit';
 import myFeatureReducer from './reducers/myFeature';
 import { globeReducer } from './reducers/CellGlobeReducer';
 import TowerReducer from './reducers/TowerReducer';
+import MainReducer from './MainReducer';
 
 export const store = configureStore({
     reducer: {
         // Your reducers go here
         myFeature: myFeatureReducer,
         globeReducer: globeReducer,
-        towerReducer: TowerReducer
+        towerReducer: TowerReducer,
+        mainReducer: MainReducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

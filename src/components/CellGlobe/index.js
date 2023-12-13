@@ -4,6 +4,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchCountries, fetchPoints, setAltitude, setTransitionDuration } from '../../store/reducers/CellGlobeReducer';
 import statsJSON from '../../datasets/stats.json'
 
+import { scaleSequential } from 'd3-scale';
+import { interpolateGreys, interpolateOranges, interpolateCividis } from 'd3-scale-chromatic';
+
+function randomIntFromInterval(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+// Define the sequential color scale
+const colorScale = scaleSequential(interpolateGreys);
+
 
 function getRandomElementsFromArray(array, n) {
     // Clone the original array to avoid modifying it
@@ -82,6 +92,8 @@ const CellGlobe = ({ width, height }) => {
     const radioPer = useSelector((state) => state.towerReducer.radioPer)
     const yearPer = useSelector((state) => state.towerReducer.yearPer)
 
+    const main = useSelector((state) => state.mainReducer)
+
     // useEffect(() => {
     //     // dispatch(fetchCountries());
     //     dispatch(fetchPoints())
@@ -93,9 +105,9 @@ const CellGlobe = ({ width, height }) => {
     // }, [dispatch]);
 
     useEffect(() => {    
-        globeEl.current.controls().autoRotate = true;
-        globeEl.current.controls().autoRotateSpeed = 0.3;
-        globeEl.current.pointOfView({ altitude: 4 }, 5000);
+        // globeEl.current.controls().autoRotate = true;
+        // globeEl.current.controls().autoRotateSpeed = 0.3;
+        // globeEl.current.pointOfView({ altitude: 4 }, 5000);
     }, []);
 
     // const polygonsData = JSON.parse(JSON.stringify(countries.features.filter(d => d.properties.ISO_A2 !== 'AQ')))
@@ -106,12 +118,29 @@ const CellGlobe = ({ width, height }) => {
     let nx = Math.round(100 + (((yearPer) * 2000) / 100))
     xp = getRandomElementsFromArray(points, nx)
 
+    const markerSvg = `<svg width="1" height="1">
+    <circle cx="0.5" cy="0.5" r="0.4" fill="red"></circle>
+</svg>`
+
     const gData = xp.map((x) => ({
         lat: x.lat,
         lng: x.lon,
         size: 0.000001,
-        color: ['red', 'white', 'blue', 'green'][Math.round(Math.random() * 3)]
+        color: [main.color.GSM, main.color.CDMA, main.color.UMTS, main.color.LTE][Math.round(Math.random() * 3)]
     }));
+
+    let newGData = []
+    const iLat = 39.0
+    const iLon = -101.0
+    for (let x = 0; x < 10; x++) {
+        for (let y = 0; y < 10; y++) {
+            newGData.push({
+                lat: iLat+(x/100),
+                lng: iLon+(y/100),
+                color: "red"
+            })
+        }
+    }
 
     return <Globe
         ref={globeEl}
@@ -121,11 +150,14 @@ const CellGlobe = ({ width, height }) => {
         
         polygonsData={countries.features}
         polygonAltitude={0.01}
-        // polygonCapColor={() => 'rgba(0, 0, 0, 0)'}
-        // polygonSideColor={() => 'rgba(0, 0, 0, 0)'}
+        polygonStrokeColor={"#36454F"}
+        
+        
+        // polygonCapColor={() => 'rgba(0, 0, 0, 0)'} rgba(200, 0, 0, 0.6)
+        // polygonSideColor={() => 'rgba(0, 0, 0, 0)'} rgba(0, 100, 0, 0.15)
         // polygonAltitude={0.1}
-        polygonCapColor={() => 'rgba(200, 0, 0, 0.6)'}
-        polygonSideColor={() => 'rgba(0, 100, 0, 0.15)'}
+        polygonCapColor={(d) => colorScale(randomIntFromInterval(1,10)/10)}
+        polygonSideColor={() => '#36454F'}
         polygonLabel={({ properties: d }) =>{ 
             
             const st = statsJSON[d.ADMIN]
@@ -149,12 +181,26 @@ const CellGlobe = ({ width, height }) => {
       LTE(4G/5G): <i>${Math.round(LTE/1000)}K</i> <br/>
 
     `}}
-        pointsData={gData}
+
+        // htmlElementsData={newGData}
+        // htmlElement={d => {
+        //     const el = document.createElement('div');
+        //     el.innerHTML = markerSvg;
+        //     // el.style.color = d.color;
+        //     // el.style.width = `${d.size}px`;
+
+        //     // el.style['pointer-events'] = 'auto';
+        //     // el.style.cursor = 'pointer';
+        //     // // el.onclick = () => console.info(d);
+        //     return el;
+        // }}
+
+        pointsData={newGData}
         pointColor="color"
         pointsMerge={false}
-        pointRadius={0.1}
-        pointResolution={2}
-        pointAltitude={0.1}
+        pointRadius={0.01}
+        pointResolution={5}
+        pointAltitude={0.01}
 
         // pointAltitude="size"
         // polygonsTransitionDuration={transitionDuration}
