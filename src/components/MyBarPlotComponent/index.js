@@ -164,7 +164,7 @@ const MyBarPlotComponent = ({width, height}) => {
     //     { group: "Paul", subgroup: "beer", value: 92 },
     // ]
 
-    return <Barplot width={width} height={height} data={data.reverse()} groups={groups} subGroups={subGroups} COLORS={COLORS}/>
+    return <Barplot width={width} height={height} data={data} groups={groups} subGroups={subGroups} COLORS={COLORS}/>
 }
 
 export default MyBarPlotComponent

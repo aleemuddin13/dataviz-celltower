@@ -61,13 +61,13 @@ const CellGlobe = ({ width, height }) => {
                     x1={xScale(value)}
                     x2={xScale(value)}
                     y1={0}
-                    y2={50}
+                    y2={20}
                     stroke="white"
                     opacity={0.4}
                 />
                 <text
                     x={xScale(value)}
-                    y={50 + 10}
+                    y={20 + 10}
                     textAnchor="middle"
                     alignmentBaseline="central"
                     fontSize={9}
@@ -90,10 +90,32 @@ const CellGlobe = ({ width, height }) => {
     // }, [dispatch]);
 
     useEffect(() => {    
+        // globeEl.current.rotateTo("India")
         // globeEl.current.controls().autoRotate = true;
         // globeEl.current.controls().autoRotateSpeed = 0.3;
-        // globeEl.current.pointOfView({ altitude: 4 }, 5000);
-    }, []);
+        for (const feature of countries.features) {
+            if(!feature.properties.ISO_A2){
+                console.log("Error ", feature)
+                alert("here")
+            }
+            
+        }
+
+        if(!main.rotateTo){
+            return
+        }
+        let bbox = false
+        for (const feature of countries.features) {
+            if(feature.properties.ISO_A2 === main.rotateTo){
+                bbox = feature.bbox
+            }
+        }
+        if(bbox){
+            const lat = (bbox[1] + bbox[3])/2
+            const lng = (bbox[0] + bbox[2]) / 2
+            globeEl.current.pointOfView({ lat, lng }, 1000);
+        }
+    }, [main.rotateTo]);
 
     // const polygonsData = JSON.parse(JSON.stringify(countries.features.filter(d => d.properties.ISO_A2 !== 'AQ')))
     const allPoints = JSON
@@ -131,18 +153,18 @@ const CellGlobe = ({ width, height }) => {
         })
     }
 
-    let newGData = []
-    const iLat = 39.0
-    const iLon = -101.0
-    for (let x = 0; x < 10; x++) {
-        for (let y = 0; y < 10; y++) {
-            newGData.push({
-                lat: iLat+(x/100),
-                lng: iLon+(y/100),
-                color: "red"
-            })
-        }
-    }
+    // let newGData = []
+    // const iLat = 39.0
+    // const iLon = -101.0
+    // for (let x = 0; x < 10; x++) {
+    //     for (let y = 0; y < 10; y++) {
+    //         newGData.push({
+    //             lat: iLat+(x/100),
+    //             lng: iLon+(y/100),
+    //             color: "red"
+    //         })
+    //     }
+    // }
 
     return <div><Globe
         ref={globeEl}
@@ -152,6 +174,12 @@ const CellGlobe = ({ width, height }) => {
         
         polygonsData={countries.features}
         polygonAltitude={0.01}
+        // polygonAltitude={({ properties: d }) => {
+        //     if(main.rotateTo === d.ISO_A2){
+        //         return 0.1
+        //     }
+        //     return 0.01
+        // }}
         polygonStrokeColor={"#36454F"}
         
         
@@ -160,6 +188,9 @@ const CellGlobe = ({ width, height }) => {
         // polygonAltitude={0.1}
         polygonCapColor={({ properties: d}) => {
             const cData = main.data[main.filter.year][main.filter.range].cMap[d.ISO_A2]
+            if(!cData){
+                return "white"
+            }
             let total = 0
             if(main.filter.radio.GSM){
                 total += cData.GSM
@@ -179,6 +210,9 @@ const CellGlobe = ({ width, height }) => {
         polygonLabel={({ properties: d }) =>{ 
             let total = 0
             const cData = main.data[main.filter.year][main.filter.range].cMap[d.ISO_A2]
+            if(!cData){
+                return `<div>No Data</div>`
+            }
             const gsm = formatLargeNumber(cData.GSM)
             const CDMA = formatLargeNumber(cData.CDMA)
             const UMTS = formatLargeNumber(cData.UMTS)
@@ -209,20 +243,24 @@ const CellGlobe = ({ width, height }) => {
         //     return el;
         // }}
 
-        pointsData={gData}
-        pointColor="color"
-        pointsMerge={false}
-        pointRadius={0.05}
-        pointResolution={3}
-        pointAltitude={0.03}
+        // pointsData={gData}
+        // pointColor="color"
+        // pointsMerge={false}
+        // pointRadius={0.05}
+        // pointResolution={3}
+        // pointAltitude={0.03}
 
         // pointAltitude="size"
         // polygonsTransitionDuration={transitionDuration}
     />
-        <div className='color-scale' style={{ width: width - 40, background: `linear-gradient(to right, ${colorScale(0)}, ${colorScale(0.5)}, ${colorScale(1)})`}}>
-            <svg width={width-40} height={90}>
-                <g>{grid}</g>
-            </svg>
+        
+        <div className='color-scale'>
+            <h6 style={{margin: 1, padding: 0}}>Cell Towers count:</h6>
+            <div style={{ width: width - 40, height:15, background: `linear-gradient(to right, ${colorScale(0)}, ${colorScale(0.5)}, ${colorScale(1)})` }}>
+                <svg width={width - 40} height={90}>
+                    <g>{grid}</g>
+                </svg>
+            </div>
         </div>
     </div>;
 };

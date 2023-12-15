@@ -1,5 +1,9 @@
 import { useMemo } from "react";
 import * as d3 from "d3";
+import { useDispatch } from 'react-redux';
+
+import { BarItem } from "./BarItem";
+import { updateRotateTo } from "../../store/MainReducer";
 
 import helper from "../../lib/helper";
 
@@ -16,6 +20,7 @@ const BAR_PADDING = 0.2;
 // };
 
 export const Barplot = ({ width, height, data, subGroups, groups, COLORS }) => {
+    const dispatch = useDispatch()
     // bounds = area inside the graph axis = calculated by substracting the margins
     const boundsWidth = width - MARGIN.right - MARGIN.left;
     const boundsHeight = height - MARGIN.top - MARGIN.bottom;
@@ -69,15 +74,15 @@ export const Barplot = ({ width, height, data, subGroups, groups, COLORS }) => {
         return (
             <g key={i}>
                 {subgroup.map((group, j) => {
-                    // console.log(group, "a2", xScale(group[0]), xScale(group[1]) - xScale(group[0]), subgroup.key)
                     return (
-                        <rect
-                            key={j}
+                        <BarItem
+                            key={i+j}
                             y={yScale(group.data)}
                             height={yScale.bandwidth()}
                             x={xScale(group[0])}
                             width={xScale(group[1]) - xScale(group[0])}
                             fill={colorScale(subgroup.key)}
+                            name={group.data}
                             opacity={0.6}
                         />
                     );

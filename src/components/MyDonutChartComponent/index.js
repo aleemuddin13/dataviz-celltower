@@ -54,8 +54,8 @@ const MyDonutChartComponent = ({ width, height }) => {
     }
 
     return <div>
-        <h6 style={{ padding: 10, margin: 0, marginLeft: 30, height: 10 }}>Radio percentages:</h6>
-        <DonutChart width={width} height={height-20} data={data} colors={COLORS} centerText={formatLargeNumber(main.stats.totalCells)} centerTextColor={main.color.PRIMARY} />
+        <h6 style={{ padding: 10, margin: 0, marginLeft: 30, height: 10, maxWidth: width-20 }}>Radio percentages:</h6>
+        <DonutChart width={width-20} height={height-20} data={data} colors={COLORS} centerText={formatLargeNumber(main.stats.totalCells)} centerTextColor={main.color.PRIMARY} />
     </div>
 }
 

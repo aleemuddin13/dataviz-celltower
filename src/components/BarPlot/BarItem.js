@@ -1,4 +1,7 @@
 import { useSpring, animated } from "@react-spring/web";
+import { useDispatch } from 'react-redux';
+
+import { updateRotateTo } from "../../store/MainReducer";
 
 // type BarItemProps = {
 //     name: string;
@@ -17,20 +20,19 @@ import { useSpring, animated } from "@react-spring/web";
 // };
 
 export const BarItem = (props) => {
-    const { name, value, barHeight, barWidth, x, y, fill } = props;
+    const dispatch = useDispatch()
+    const { name, value, height: barHeight, width: barWidth, x, y, fill } = props;
 
     const springProps = useSpring({
         // the 'from' properties will be used only to animate the initialization of the component
         // if you put nothing it will be initialized with the first prop that is provided
         from: {
-            value: 0,
             barWidth: 0,
             valueOpacity: 0,
         },
         to: {
-            value: value,
             barWidth: barWidth,
-            valueOpacity: barWidth > 80 ? 1 : 0,
+            valueOpacity:1,
             y,
         },
         config: {
@@ -40,6 +42,9 @@ export const BarItem = (props) => {
 
     return (
             <animated.rect
+                onClick={() => {
+                    dispatch(updateRotateTo(name))
+                }}
                 x={x}
                 y={springProps.y}
                 width={springProps.barWidth}
@@ -47,7 +52,7 @@ export const BarItem = (props) => {
                 opacity={springProps.valueOpacity}
                 fill={fill}
                 // fillOpacity={0.3}
-                strokeWidth={1}
+                // strokeWidth={1}
                 rx={1}
             />
            

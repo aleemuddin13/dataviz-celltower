@@ -30,8 +30,8 @@ function App() {
           </div>
           <div className="top-section">
             <div>
-              <h6 style={{padding: 0, margin: 0, marginLeft: 30}}>Top countries with most number of cell towers</h6>
-              <MyBarPlotComponent width={width / 2} height={(height / 2)-20} />
+              <h6 style={{padding: 0, margin: 0, marginLeft: 30, maxWidth: (width/2) - 30}}>Top countries with most number of cell towers</h6>
+              <MyBarPlotComponent width={(width / 2)-15} height={(height / 2)-30} />
             </div>
           </div>
         </div>

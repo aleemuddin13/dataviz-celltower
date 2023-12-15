@@ -128,14 +128,6 @@ const getSutroTowerData = (towerWidth, towerHeight, floors) => {
 
     return {
         lines: [
-            // left
-            // {
-            //     x1: leftShoulder,
-            //     x2: leftShoulder,
-            //     y1: 0,
-            //     y2: crossbeamHeight,
-            //     strokeWidth: strokeWidth * 0.7
-            // },
             {
                 x1: leftShoulder,
                 x2: leftWaist,
@@ -150,14 +142,6 @@ const getSutroTowerData = (towerWidth, towerHeight, floors) => {
                 y2: towerHeight,
                 strokeWidth
             },
-            // center
-            // {
-            //     x1: center * 1.07,
-            //     x2: center * 1.07,
-            //     y1: 5,
-            //     y2: crossbeamHeight,
-            //     strokeWidth: strokeWidth * 0.7
-            // },
             {
                 x1: center * 1.07,
                 x2: center * 1.07,
@@ -165,14 +149,6 @@ const getSutroTowerData = (towerWidth, towerHeight, floors) => {
                 y2: towerHeight,
                 strokeWidth
             },
-            // right
-            // {
-            //     x1: rightShoulder,
-            //     x2: rightShoulder,
-            //     y1: 0,
-            //     y2: crossbeamHeight,
-            //     strokeWidth: strokeWidth * 0.7
-            // },
             {
                 x1: rightShoulder,
                 x2: rightWaist,
@@ -252,9 +228,6 @@ function formatLargeNumber(number) {
 }
 
 const constants = {
-
-
-
 }
 
 const helper = {

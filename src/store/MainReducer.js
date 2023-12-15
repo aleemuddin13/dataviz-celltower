@@ -23,6 +23,7 @@ const initialState = {
         }
     },
     ccList,
+    rotateTo: "IN",
     data
 }
 
@@ -132,9 +133,12 @@ export const MainReducerSlice = createSlice({
         updateFilterRange: (state, payload) => {
             state.filter.range = payload.payload
             updateCurrentStats(state)
+        },
+        updateRotateTo: (state, payload)=> {
+            state.rotateTo = payload.payload
         }
     }
 })
 
-export const { updateFilterRadio, updateFilterRange, updateFilterYear} = MainReducerSlice.actions
+export const { updateFilterRadio, updateFilterRange, updateFilterYear, updateRotateTo } = MainReducerSlice.actions
 export default MainReducerSlice.reducer

@@ -1,8 +1,13 @@
 import { useMemo } from "react";
 import { useSpring, animated } from "@react-spring/web";
+import { useDispatch } from 'react-redux';
 
+import helper  from "../../lib/helper";
+import { updateRotateTo } from "../../store/MainReducer";
 import * as d3 from "d3";
 import { BarItem } from "./BarItem";
+
+// const 
 
 const MARGIN = { top: 0, right: 30, bottom: 30, left: 30 };
 const BAR_PADDING = 0.2;
@@ -17,7 +22,7 @@ const BAR_PADDING = 0.2;
 // };
 
 export const Barplot = ({ width, height, data, groups, subGroups, COLORS }) => {
-    
+    const dispatch = useDispatch()
     // bounds = area inside the graph axis = calculated by substracting the margins
     const boundsWidth = width - MARGIN.right - MARGIN.left;
     const boundsHeight = height - MARGIN.top - MARGIN.bottom;
@@ -62,6 +67,7 @@ export const Barplot = ({ width, height, data, groups, subGroups, COLORS }) => {
     var colorScale = d3.scaleOrdinal().domain(subGroups).range(COLORS);
 
     const rectangles = series.map((subgroup, i) => {
+        console.log(subgroup)
         return (
             <g key={i}>
                 {subgroup.map((group, j) => {
