@@ -1,40 +1,28 @@
 import { useMemo } from "react";
-import { useSpring, animated } from "@react-spring/web";
-import { useDispatch } from 'react-redux';
-
-import helper  from "../../lib/helper";
-import { updateRotateTo } from "../../store/MainReducer";
 import * as d3 from "d3";
-import { BarItem } from "./BarItem";
 
-// const 
+import { BarItem } from "./BarItem";
+import helper from "../../lib/helper";
+
+const formatLargeNumber = helper.formatLargeNumber
 
 const MARGIN = { top: 0, right: 30, bottom: 30, left: 30 };
 const BAR_PADDING = 0.2;
-// export const COLORS = ["#e85252", "#6689c6", "#9a6fb0"];
 
-// export const COLORS = ['#FFA500', '#00FFFF', '#FF33DD']
 
-// type BarplotProps = {
-//     width: number;
-//     height: number;
-//     data: { group: string; subgroup: string; value: number }[];
-// };
-
-export const Barplot = ({ width, height, data, groups, subGroups, COLORS }) => {
-    const dispatch = useDispatch()
+export const Barplot = ({ width, height, data, subGroups, groups, COLORS }) => {
     // bounds = area inside the graph axis = calculated by substracting the margins
     const boundsWidth = width - MARGIN.right - MARGIN.left;
     const boundsHeight = height - MARGIN.top - MARGIN.bottom;
-
-    // const groups = [...new Set(data.map((d) => d.group))];
-    // const subGroups = [...new Set(data.map((d) => d.subgroup))];
 
     // Reformat the dataset
     const stackGenerator = d3
         .stack()
             .keys(subGroups)
-        .value((d, k) => data.filter((item) => item.group === d && item.subgroup === k)[0].value);
+            .value((d,t) => {
+                let z = data.filter((item) => item.group === d && item.subgroup === t)[0].value
+                return z
+            });
     const series = stackGenerator(groups);
 
     // Find size of the longest bar and group rank.
@@ -66,27 +54,27 @@ export const Barplot = ({ width, height, data, groups, subGroups, COLORS }) => {
     // Color Scale
     var colorScale = d3.scaleOrdinal().domain(subGroups).range(COLORS);
 
+
     const rectangles = series.map((subgroup, i) => {
-        console.log(subgroup)
         return (
             <g key={i}>
                 {subgroup.map((group, j) => {
                     return (
                         <BarItem
-                            key={j}
+                            key={i+j}
                             y={yScale(group.data)}
-                            barHeight={yScale.bandwidth()}
+                            height={yScale.bandwidth()}
                             x={xScale(group[0])}
-                            barWidth={xScale(group[1]) - xScale(group[0])}
+                            width={xScale(group[1]) - xScale(group[0])}
                             fill={colorScale(subgroup.key)}
+                            name={group.data}
+                            opacity={0.6}
                         />
                     );
                 })}
             </g>
         );
     });
-
-    // const rectangles = []
 
     const labels = sortedGroupTotalValues.map((group, i) => {
         const y = yScale(group.name);
@@ -105,7 +93,7 @@ export const Barplot = ({ width, height, data, groups, subGroups, COLORS }) => {
                     fontSize={12}
                     opacity={xScale(group.value) > 90 ? 1 : 0} // hide label if bar is not wide enough
                 >
-                    {group.value}
+                    {formatLargeNumber(group.value)}
                 </text>
                 <text
                     x={xScale(0) + 7}
@@ -131,7 +119,7 @@ export const Barplot = ({ width, height, data, groups, subGroups, COLORS }) => {
                     y1={0}
                     y2={boundsHeight}
                     stroke="white"
-                    opacity={0.2}
+                    opacity={0.4}
                 />
                 <text
                     x={xScale(value)}
@@ -140,9 +128,9 @@ export const Barplot = ({ width, height, data, groups, subGroups, COLORS }) => {
                     alignmentBaseline="central"
                     fontSize={9}
                     opacity={0.8}
-                    fill="white"
+                    fill={"white"}
                 >
-                    {value}
+                    {formatLargeNumber(value)}
                 </text>
             </g>
         ));

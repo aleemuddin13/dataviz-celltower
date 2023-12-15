@@ -198,16 +198,6 @@ const CellTowerComponent = ({ width, height }) => {
 
     })
 
-    // useEffect(() => {
-    //     if(!initialized){
-    //         return
-    //     }
-    //     const g = d3.select(svgRef.current).select('#tower-base-g')
-    //     console.log(g)
-    //     createFloors(g, towerGemetryData.childTrapezoidList)
-
-    //  }, [initialized, selectedFloor])
-
     return (
         <svg width={width} height={height} id="cell-tower-component-svg" ref={svgRef}>
         </svg>

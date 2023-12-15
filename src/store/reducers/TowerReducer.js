@@ -191,15 +191,15 @@ export const TowerReducerSlice = createSlice({
         },
         setFloor: (state, payload) => {
             state.selectedFloor = payload.payload
-            fetchMetrics(state)
+            // fetchMetrics(state)
         },
         updateRadio: (state, payload) => {
             state.enableRadio = {...state.enableRadio, ...payload.payload}
-            fetchMetrics(state)
+            // fetchMetrics(state)
         },
         updateTowerRange: (state, payload) => {
             state.towerRange = payload.payload
-            fetchMetrics(state)
+            // fetchMetrics(state)
         }
     },
 });

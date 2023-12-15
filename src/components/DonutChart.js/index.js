@@ -3,28 +3,7 @@ import * as d3 from "d3";
 import { animated, SpringValue, useSpring } from "react-spring";
 import Tooltip from "./Tooltip";
 
-// type DataItem = {
-//     name: string;
-//     value?: number;
-// };
-
-// type DonutChartProps = {
-//     width: number;
-//     height: number;
-//     data: DataItem[];
-// };
-
 const MARGIN = 30;
-
-// const colors = [
-//     "#e0ac2b",
-//     "#e85252",
-//     "#6689c6",
-//     "#9a6fb0",
-//     "#a53253",
-//     "#69b3a2",
-// ];
-
 export const DonutChart = ({ width, height, data, colors, centerText, centerTextColor }) => {
 
     const [interactionData, setInteractionData] = useState();
@@ -78,11 +57,6 @@ export const DonutChart = ({ width, height, data, colors, centerText, centerText
     );
 };
 
-// type SliceProps = {
-//     color: string;
-//     radius: number;
-//     slice: d3.PieArcDatum<DataItem>;
-// };
 const Slice = ({ slice, radius, color }) => {
     const arcPathGenerator = d3.arc();
 

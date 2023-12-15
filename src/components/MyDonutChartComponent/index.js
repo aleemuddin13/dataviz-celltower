@@ -14,8 +14,6 @@ const MyDonutChartComponent = ({ width, height }) => {
     const data = []
     const COLORS = []
 
-    let str = ''
-
     if (filter.radio.GSM) {
         data.push({ 
             name: "GSM",

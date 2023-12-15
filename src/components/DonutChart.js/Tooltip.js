@@ -10,11 +10,6 @@ const Tooltip = ({ interactionData }) => {
     }
 
     const {x, y, text} = interactionData
-    // Calculate tooltip position based on window dimensions
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    const tooltipWidth = 200; // Adjust as needed
-    const tooltipHeight = 40; // Adjust as needed
 
     const positionStyle = {
         background: '#fff',
@@ -34,10 +29,5 @@ const Tooltip = ({ interactionData }) => {
     );
 };
 
-// Tooltip.propTypes = {
-//     x: PropTypes.number.isRequired,
-//     y: PropTypes.number.isRequired,
-//     text: PropTypes.string.isRequired,
-// };
 
 export default Tooltip;

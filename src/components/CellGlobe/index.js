@@ -43,7 +43,6 @@ const CellGlobe = ({ width, height }) => {
     const globeEl = useRef();
     const dispatch = useDispatch();
     const { countries, altitude, transitionDuration, points } = useSelector((state) => state.globeReducer);
-    const radioPer = useSelector((state) => state.towerReducer.radioPer)
     const yearPer = useSelector((state) => state.towerReducer.yearPer)
 
     const main = useSelector((state) => state.mainReducer)
@@ -79,16 +78,6 @@ const CellGlobe = ({ width, height }) => {
             </g>
         ));
 
-    // useEffect(() => {
-    //     // dispatch(fetchCountries());
-    //     dispatch(fetchPoints())
-
-    //     // setTimeout(() => {
-    //     //     dispatch(setTransitionDuration(4000));
-    //     //     dispatch(setAltitude(feat => Math.max(0.1, Math.sqrt(+feat.properties.POP_EST) * 7e-5)));
-    //     // }, 3000);
-    // }, [dispatch]);
-
     useEffect(() => {    
         // globeEl.current.rotateTo("India")
         // globeEl.current.controls().autoRotate = true;
@@ -117,17 +106,9 @@ const CellGlobe = ({ width, height }) => {
         }
     }, [main.rotateTo]);
 
-    // const polygonsData = JSON.parse(JSON.stringify(countries.features.filter(d => d.properties.ISO_A2 !== 'AQ')))
-    const allPoints = JSON
-    const N = 300;
-
     let xp = points
     let nx = Math.round(100 + (((yearPer) * 2000) / 100))
     xp = getRandomElementsFromArray(points, nx)
-
-    const markerSvg = `<svg width="1" height="1">
-    <circle cx="0.5" cy="0.5" r="0.4" fill="red"></circle>
-</svg>`
 
     const gData = []
     const colors = []
@@ -153,18 +134,7 @@ const CellGlobe = ({ width, height }) => {
         })
     }
 
-    // let newGData = []
-    // const iLat = 39.0
-    // const iLon = -101.0
-    // for (let x = 0; x < 10; x++) {
-    //     for (let y = 0; y < 10; y++) {
-    //         newGData.push({
-    //             lat: iLat+(x/100),
-    //             lng: iLon+(y/100),
-    //             color: "red"
-    //         })
-    //     }
-    // }
+
 
     return <div><Globe
         ref={globeEl}
@@ -230,25 +200,12 @@ const CellGlobe = ({ width, height }) => {
                     </div>
              `}}
 
-        // htmlElementsData={newGData}
-        // htmlElement={d => {
-        //     const el = document.createElement('div');
-        //     el.innerHTML = markerSvg;
-        //     // el.style.color = d.color;
-        //     // el.style.width = `${d.size}px`;
-
-        //     // el.style['pointer-events'] = 'auto';
-        //     // el.style.cursor = 'pointer';
-        //     // // el.onclick = () => console.info(d);
-        //     return el;
-        // }}
-
-        // pointsData={gData}
-        // pointColor="color"
-        // pointsMerge={false}
-        // pointRadius={0.05}
-        // pointResolution={3}
-        // pointAltitude={0.03}
+        pointsData={gData}
+        pointColor="color"
+        pointsMerge={false}
+        pointRadius={0.05}
+        pointResolution={3}
+        pointAltitude={0.03}
 
         // pointAltitude="size"
         // polygonsTransitionDuration={transitionDuration}
