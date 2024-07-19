@@ -4,7 +4,7 @@
 ## Overview
 This Project is an interactive web application that visualizes the worldwide distribution and technological evolution of cell towers. Leveraging a rich dataset, the application provides an immersive experience, allowing users to engage with the data through a 3D globe and interactive analytical tools.
 
-## [Demo](https://datavizcelltower.web.app/){target="_blank"}
+## [Demo](https://datavizcelltower.web.app/)
 
 ## Features
 - **3D Globe Visualization**: Countries are color-coded based on the cell tower count, offering a global perspective at a glance.
